@@ -502,6 +502,10 @@
 	caption-side:bottom;
 }
 
+.officer_now{
+    padding-left: 30px;
+}
+
 /* privacy
 --------------------------------------------------------------------*/
 #third-page dl.privacy {
