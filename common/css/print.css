@@ -1,0 +1,50 @@
+@media print {
+  /*-----------------------------------------------------------
+  departBanner
+  -------------------------------------------------------------*/
+  body {
+    font-size: 10pt;
+    background: none;
+  }
+  body #wrap {
+    background-image: none !important;
+  }
+  img {
+    border: none;
+  }
+  #wrapper {
+    width: auto;
+  }
+  header {
+    height: 65px;
+    background-image: none;
+    border-bottom: 1px solid #ccc;
+  }
+  header .freedial,
+  header .subNav {
+    display: none;
+  }
+  header #line2 {
+    display: none;
+  }
+  footer {
+    background: none;
+  }
+  footer #fotterInner .utility {
+    display: none;
+  }
+  #footerMenu h1 {
+    margin: 0;
+    -webkit-box-shadow: none;
+    -moz-box-shadow: none;
+    box-shadow: none;
+  }
+  .totop {
+    display: none;
+  }
+  /* for IE
+  ------------------------------------------------*/
+  body {
+    *zoom: 82%;
+  }
+}

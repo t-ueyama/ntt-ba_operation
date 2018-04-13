@@ -1,0 +1,735 @@
+<?php
+
+	//ini_set('error_reporting', E_ALL);
+	//ini_set( 'display_errors', 1 ); 
+
+	// 基本設定 -----------------------------------------------------
+	define( "MAIL_FROM_NAME", 'NTT-BA Webサイト' ); // 差出人宛名
+	define( "MAIL_FROM", 'info2-ml@ntt-ba.co.jp' ); // 差出人アドレス
+	define( "MAIL_ENVFROM", '-finfo2-ml@ntt-ba.co.jp' ); // 差出人アドレス
+	define( "MAIL_TO",   'info2-ml@ntt-ba.co.jp' ); // 事務局アドレス
+
+	define( "MAIL_SUBJECT", 'メールマガジン配信のお申し込み' ); // メールタイトル
+
+
+	// 初期化処理 ---------------------------------------------------
+	session_start();
+
+	$content_title = "ご登録 | メールマガジンのご案内 | NTTビジネスアソシエ";
+	$content_img   = "img/page_head_mailmaform01.png";
+	$content_body  = "";
+	$error = array();
+	$content_caution = 'on';
+	$know_hidden = '';
+	$know_mail = '';
+	$count = 0;
+	
+	$NAME               = isset( $_POST['NAME'] ) ? $_POST['NAME'] : '';
+	$NAME_KANA          = isset( $_POST['NAME_KANA'] ) ? $_POST['NAME_KANA'] : '';
+	$MAIL_ADDRESS       = isset( $_POST['MAIL_ADDRESS'] ) ? $_POST['MAIL_ADDRESS'] : '';
+	$WHAT_SERVICE       = isset( $_POST['WHAT_SERVICE'] ) ? $_POST['WHAT_SERVICE'] : '';
+	$NEEDS              = isset( $_POST['NEEDS'] ) ? $_POST['NEEDS'] : '';
+	$know               = isset( $_POST['know'] ) ? $_POST['know'] : array();
+	$know_txt           = isset( $_POST['know_txt'] ) ? $_POST['know_txt'] : '';
+	$privacy            = isset( $_POST['privacy'] ) ? $_POST['privacy'] : '';
+	$mode               = isset( $_POST['mode'] ) ? $_POST['mode'] : '';
+
+
+	// function -----------------------------------------------------
+	function h( $str ){
+		print htmlspecialchars( $str , ENT_QUOTES ); 
+	}
+
+	function hsc($str) {
+		if (is_array($str)) {
+			return array_map( "hsc", $str );
+		} else {
+			return htmlspecialchars( $str, ENT_QUOTES );
+		}
+	}
+
+	class HTML_ENC_Class {
+		public function h( $str ){
+			return htmlspecialchars( $str , ENT_QUOTES );
+		}
+	}
+	$enc = new HTML_ENC_Class();
+
+	// 処理開始 -----------------------------------------------------
+	if( $mode === "confirm" || $mode === "send" ){
+
+		//トークンチェック
+		if( empty( $_SESSION['token'] ) || ( $_SESSION['token'] != $_POST['token'] )){
+			header( 'Location: form.html' );
+			exit;
+		}else{
+			$token = $_POST['token'];
+		}
+
+		if( mb_strlen( $NAME, "UTF-8" ) <= 0 ){
+			$error[] = '「氏名」は必須項目ですが入力されていません。';
+		}
+		if( 100 < mb_strlen( $NAME, "UTF-8" ) ){
+			$error[] = '「氏名」は100文字以内で入力してください。';
+		}
+		if( mb_strlen( $NAME_KANA, "UTF-8" ) <= 0 ){
+			$error[] = '「フリガナ」は必須項目ですが入力されていません。';
+		}
+		if( 100 < mb_strlen( $NAME_KANA, "UTF-8" ) ){
+			$error[] = '「フリガナ」は100文字以内で入力してください。';
+		}
+		if( mb_strlen( $MAIL_ADDRESS, "UTF-8" ) <= 0 ){
+			$error[] = '「E-mailアドレス」は必須項目ですが入力されていません。';
+		}elseif( !preg_match( "/^([a-zA-Z0-9])+([a-zA-Z0-9\._-])*@([a-zA-Z0-9_-])+([a-zA-Z0-9\._-]+)+$/", $MAIL_ADDRESS ) ){
+			$error[] = '「E-mailアドレス」が正しくありません。' . PHP_EOL;
+		}
+		if( 100 < mb_strlen( $MAIL_ADDRESS, "UTF-8" ) ){
+			$error[] = '「E-mailアドレス」は100文字以内で入力してください。';
+		}
+		if( 100 < mb_strlen( $NEEDS, "UTF-8" ) ){
+			$error[] = '「現在抱えている課題・ニーズ」は100文字以内で入力してください。';
+		}
+		if( 100 < mb_strlen( $know_txt, "UTF-8" ) ){
+			$error[] = '「弊社を知ったきっかけ」の「その他」は100文字以内で入力してください。';
+		}
+		if( $privacy != 'yes' ){
+			$error[] = '個人情報の取り扱いについて同意していただく必要があります。';
+		}
+	}
+	
+	//送信時
+	if( $mode === "send" && count( $error ) == 0 ){
+
+		$fp = fopen( ".ht_count", "r+" );
+		$count = fgets( $fp );
+		$count++;
+		rewind( $fp );
+		fputs( $fp, $count );
+		fclose( $fp );
+		$count = str_pad($count, 5, 0, STR_PAD_LEFT);
+
+		mb_language( "japanese" );
+		mb_internal_encoding( "UTF-8" );
+
+		foreach ($know as $val) { $know_mail .= $val . "\n"; }
+		
+		$mail_body = <<< EOF
+お問い合わせ番号: $count
+
+------------------------------------------------------------------
+■ 氏名
+$NAME
+
+■ フリガナ
+$NAME_KANA
+
+■ E-mailアドレス
+$MAIL_ADDRESS
+
+■ 問合せしたいサービス
+$WHAT_SERVICE
+
+■ 現在抱えている課題・ニーズ
+$NEEDS
+
+■ 弊社を知ったきっかけ
+$know_mail
+$know_txt
+
+------------------------------------------------------------------
+
+EOF
+;
+
+		$mail_body .= date("Y-m-d H:i:s"); 
+
+		$mail_header = 'From:' . mb_encode_mimeheader( MAIL_FROM_NAME, 'ISO-2022-JP' ) . '<' . MAIL_FROM . '>';
+
+		if(!mb_send_mail( MAIL_TO, MAIL_SUBJECT.' : '.$count, $mail_body, $mail_header, MAIL_ENVFROM )){
+	
+			$content_body = <<< EOF
+								<p>
+									<span class="error-mail">メールが送信できませんでした。
+									<br>しばらくしてから再度アクセスしてください。</span>
+								</p>
+EOF
+;
+
+		}else{
+			$content_body = <<< EOF
+								<p><img src="/img/form_flow03.png" class="img-responsive center-block" alt="ステップ1.入力（現在位置） ステップ2.確認　ステップ3.送信" /></p>
+								<br>
+								<p class="text-center">
+									ご入力ありがとうございました。
+								</p>
+								<div class="banner-button text-center">
+									<a href="http://www.ntt-ba.co.jp/"><img src="/img/form_btn04.png" alt="TOPへ戻る"></a>
+								</div>
+EOF
+;
+
+			$content_caution = 'off';
+			$content_title = "送信完了（ご登録） | メールマガジンのご案内 | NTTビジネスアソシエ";
+			$content_img   = "img/page_head_mailmaform03.png";
+		}
+
+
+	}elseif( $mode === "confirm" && count( $error ) == 0 ){
+		
+		// 確認時
+		$content_caution = 'off';
+		$content_title = "入力内容の確認（ご登録） | メールマガジンのご案内 | NTTビジネスアソシエ";
+		$content_img   = "img/page_head_mailmaform02.png";
+		
+		$know_html = implode( "<br>", hsc($know) );
+		$privacy_html = $privacy == 'yes' ? '同意する' : '同意しない';
+		
+		foreach ($know as $val) {
+			$know_hidden .= '<input type="hidden" name="know[]" value="' . hsc($val) . '">' . PHP_EOL;
+		}
+
+		$content_body = <<< EOF
+								<p><img src="/img/form_flow02.png" class="img-responsive center-block" alt="ステップ1.入力（現在位置） ステップ2.確認　ステップ3.送信" /></p>
+
+								
+								<div class="form-area">
+									<div class="row">
+										<div class="col-xs-12 col-sm-4">
+											<p class="item-area">
+												<label for="c_name">氏名</label>
+											</p>
+										</div>
+										<div class="col-xs-12 col-sm-8">
+											<p class="input-area">
+												{$enc->h($NAME)}
+											</p>
+										</div>
+									</div>
+									<hr>
+									
+									<div class="row">
+										<div class="col-xs-12 col-sm-4">
+											<p class="item-area">
+												<label for="n_kana">フリガナ</label>
+											</p>
+										</div>
+										<div class="col-xs-12 col-sm-8">
+											<p class="input-area">
+												{$enc->h($NAME_KANA)}
+											</p>
+										</div>
+									</div>
+									<hr>
+									
+									<div class="row">
+										<div class="col-xs-12 col-sm-4">
+											<p class="item-area">
+												<label for="e_addr">E-mailアドレス</label>
+											</p>
+										</div>
+										<div class="col-xs-12 col-sm-8">
+											<p class="input-area">
+												{$enc->h($MAIL_ADDRESS)}
+											</p>
+										</div>
+									</div>
+									<hr>
+								</div>
+									
+								<div class="form-area">
+									<div class="row">
+										<div class="col-xs-12 col-sm-4">
+											<p class="item-area">
+												<label for="each_serv">興味のあるサービス</label>
+											</p>
+										</div>
+										<div class="col-xs-12 col-sm-8">
+											<p class="input-area">
+												{$enc->h($WHAT_SERVICE)}
+											</p>
+										</div>
+									</div>
+									<hr>
+									
+									<div class="row">
+										<div class="col-xs-12 col-sm-4">
+											<p class="item-area">
+												現在抱えている
+												<br>課題・ニーズ
+											</p>
+										</div>
+										<div class="col-xs-12 col-sm-8">
+											<p class="input-area">
+												{$enc->h($NEEDS)}
+											</p>
+										</div>
+									</div>
+									<hr>
+
+									<div class="row">
+										<div class="col-xs-12 col-sm-4">
+											<p class="item-area">
+												弊社を知ったきっかけ
+											</p>
+										</div>
+										<div class="col-xs-12 col-sm-8">
+											<p class="input-area">
+												$know_html<br>
+												{$enc->h($know_txt)}
+											</p>
+										</div>
+									</div>
+									<hr>
+									
+									<div class="row">
+										<div class="col-xs-12 col-sm-4">
+											<p class="item-area">
+												個人情報の取り扱い
+											</p>
+										</div>
+										<div class="col-xs-12 col-sm-8">
+											<p class="input-area">
+												{$enc->h($privacy_html)}
+											</p>
+										</div>
+									</div>
+								</div>
+
+
+								<div class="row">
+									<div class="col-xs-12 col-sm-offset-2 col-sm-4">
+										<form action="form.html?finish=mailma" method="post">
+											<input type="hidden" name="NAME" value="{$enc->h($NAME)}">
+											<input type="hidden" name="NAME_KANA" value="{$enc->h($NAME_KANA)}">
+											<input type="hidden" name="MAIL_ADDRESS" value="{$enc->h($MAIL_ADDRESS)}">
+											<input type="hidden" name="WHAT_SERVICE" value="{$enc->h( $WHAT_SERVICE )}">
+											<input type="hidden" name="NEEDS" value="{$enc->h($NEEDS)}">
+											$know_hidden
+											<input type="hidden" name="know_txt" value="{$enc->h($know_txt)}">
+											<input type="hidden" name="privacy" value="{$enc->h($privacy)}">
+											
+											<input type="hidden" name="token"  value="{$enc->h($token)}">
+											<input type="hidden" name="mode" value="send">
+											<div class="banner-button text-center">
+												<input src="/img/form_btn02.png" type="image" alt="送信">
+											</div>
+										</form>
+									</div>
+									<div class="col-xs-12 col-sm-4">
+										<form action="form.html" method="post">
+											<input type="hidden" name="NAME" value="{$enc->h($NAME)}">
+											<input type="hidden" name="NAME_KANA" value="{$enc->h($NAME_KANA)}">
+											<input type="hidden" name="MAIL_ADDRESS" value="{$enc->h($MAIL_ADDRESS)}">
+											<input type="hidden" name="WHAT_SERVICE" value="{$enc->h( $WHAT_SERVICE )}">
+											<input type="hidden" name="NEEDS" value="{$enc->h($NEEDS)}">
+											$know_hidden
+											<input type="hidden" name="know_txt" value="{$enc->h($know_txt)}">
+											<input type="hidden" name="privacy" value="{$enc->h($privacy)}">
+
+											<div class="banner-button text-center">
+												<input src="/img/form_btn03.png" type="image" alt="修正">
+											</div>
+										</form>
+									</div>
+								</div>
+	
+EOF
+;
+
+
+	}else{
+
+		// 初回 or エラー時
+		
+		// トークン発行
+		$token = rtrim( base64_encode( mcrypt_create_iv( 32, MCRYPT_DEV_URANDOM )), '=' );
+		$_SESSION['token'] = $token;
+
+		$what_service01 = strcmp( $WHAT_SERVICE, '社宅管理代行サービス') ? '' : 'selected';
+		$what_service02 = strcmp( $WHAT_SERVICE, '経理業務効率化コンサルティング') ? '' : 'selected';
+		$what_service03 = strcmp( $WHAT_SERVICE, '内部統制強化コンサルティング') ? '' : 'selected';
+		$what_service04 = strcmp( $WHAT_SERVICE, '経理シェアードサービスセンターの設立・運営コンサルティング') ? '' : 'selected';
+		$what_service05 = strcmp( $WHAT_SERVICE, '経理業務アウトソーシングサービス') ? '' : 'selected';
+		$what_service06 = strcmp( $WHAT_SERVICE, '経理人材育成支援サービス') ? '' : 'selected';
+		$what_service08 = strcmp( $WHAT_SERVICE, '労働条件諸制度コンサルティング') ? '' : 'selected';
+		$what_service09 = strcmp( $WHAT_SERVICE, '給与支給業務アウトソーシングサービス') ? '' : 'selected';
+		$what_service10 = strcmp( $WHAT_SERVICE, '福利厚生サービス') ? '' : 'selected';
+		$what_service11 = strcmp( $WHAT_SERVICE, '健康診断サポートサービス') ? '' : 'selected';
+
+		$know_check01 = in_array( "前から知っていた", $know ) ? 'checked' : '';
+		$know_check02 = in_array( "知人の紹介", $know ) ? 'checked' : '';
+		$know_check03 = in_array( "検索サイト", $know ) ? 'checked' : '';
+		$know_check04 = in_array( "他のサイト", $know ) ? 'checked' : '';
+		$know_check05 = in_array( "その他", $know ) ? 'checked' : '';
+		
+		$privacy_check01 = strcmp( $privacy, 'yes') ? '' : 'checked';
+		$privacy_check02 = strcmp( $privacy, 'no') ? '' : 'checked';
+
+		$content_body = <<< EOF
+								<p><img src="/img/form_flow01.png" class="img-responsive center-block" alt="ステップ1.入力（現在位置） ステップ2.確認　ステップ3.送信" /></p>
+
+								<form action="form.html" method="post">
+									<div class="form-area">
+										<div class="row">
+											<div class="col-xs-12 col-sm-4">
+												<p class="item-area">
+													<label for="c_name">氏名<span class="required">※</span></label>
+												</p>
+											</div>
+											<div class="col-xs-12 col-sm-8">
+												<p class="input-area">
+													<input type="text" name="NAME" id="c_name" value="{$enc->h($NAME)}">
+													<small>例）山田　太郎</small>
+												</p>
+											</div>
+										</div>
+										<hr>
+										
+										<div class="row">
+											<div class="col-xs-12 col-sm-4">
+												<p class="item-area">
+													<label for="n_kana">フリガナ<span class="required">※</span></label>
+												</p>
+											</div>
+											<div class="col-xs-12 col-sm-8">
+												<p class="input-area">
+													<input type="text" name="NAME_KANA" id="n_kana" value="{$enc->h($NAME_KANA)}">
+													<small>例）ヤマダ　タロウ</small>
+												</p>
+											</div>
+										</div>
+										<hr>
+										
+										<div class="row">
+											<div class="col-xs-12 col-sm-4">
+												<p class="item-area">
+													<label for="e_addr">E-mailアドレス<span class="required">※</span>
+													<br><small>＊携帯アドレスは入力できません。</small></label>
+												</p>
+											</div>
+											<div class="col-xs-12 col-sm-8">
+												<p class="input-area">
+													<input type="text" name="MAIL_ADDRESS" id="e_addr" value="{$enc->h($MAIL_ADDRESS)}">
+													<small>例）XXXX@ntt-ba.co.jp</small>
+												</p>
+											</div>
+										</div>
+									</div>
+									
+									<div class="form-area">
+										<div class="row">
+											<div class="col-xs-12 col-sm-4">
+												<p class="item-area">
+													<label for="each_serv">興味のあるサービス</label>
+												</p>
+											</div>
+											<div class="col-xs-12 col-sm-8">
+												<p class="input-area">
+													<select id="each_serv" name="WHAT_SERVICE">
+														<option selected="selected" value="">▼こちらから選択してください</option>
+														<optgroup label="＜不動産関連サービス＞">
+															<option value="社宅管理代行サービス" $what_service01>┗&nbsp;社宅管理代行サービス</option>
+														</optgroup>
+														<optgroup label="＜経理・財務関連サービス＞">
+															<option value="経理業務アウトソーシングサービス" $what_service05>┣&nbsp;経理業務アウトソーシングサービス</option>
+															<option value="経理業務効率化コンサルティング" $what_service02>┣&nbsp;経理業務効率化コンサルティング</option>
+															<option value="内部統制強化コンサルティング" $what_service03>┣&nbsp;内部統制強化コンサルティング</option>
+															<option value="経理シェアードサービスセンターの設立・運営コンサルティング" $what_service04>┣&nbsp;経理シェアードサービスセンターの設立・運営コンサルティング</option>
+															<option value="経理人材育成支援サービス" $what_service06>┣&nbsp;経理人材育成支援サービス</option>
+														</optgroup>
+														<optgroup label="＜人事・給与・福利厚生関連サービス＞">
+															<option value="福利厚生サービス" $what_service10>┣&nbsp;福利厚生サービス</option>
+															<option value="給与支給業務アウトソーシングサービス" $what_service09>┣&nbsp;給与支給業務アウトソーシングサービス</option>
+															<option value="健康診断サポートサービス" $what_service11>┗&nbsp;健康診断サポートサービス</option>
+															<option value="労働条件諸制度コンサルティング" $what_service08>┣&nbsp;労働条件諸制度コンサルティング</option>
+														</optgroup>
+													</select>
+												</p>
+											</div>
+										</div>
+										<hr>
+										
+										<div class="row">
+											<div class="col-xs-12 col-sm-4">
+												<p class="item-area">
+													現在抱えている
+													<br>課題・ニーズ
+												</p>
+											</div>
+											<div class="col-xs-12 col-sm-8">
+												<p class="input-area">
+													<input type="text" name="NEEDS" id="now_needs" value="{$enc->h($NEEDS)}">
+													<small>例）業務の稼働を削減したい</small>
+												</p>
+											</div>
+										</div>
+										<hr>
+										
+										<div class="row">
+											<div class="col-xs-12 col-sm-4">
+												<p class="item-area">
+													弊社を知ったきっかけ
+												</p>
+											</div>
+											<div class="col-xs-12 col-sm-8">
+												<p class="input-area">
+													<input name="know[]" type="checkbox" value="前から知っていた" id="know01" $know_check01><label for="know01">前から知っていた</label>
+													<br><input name="know[]" type="checkbox" value="知人の紹介" id="know02" $know_check02><label for="know02">知人の紹介</label>
+													<br><input name="know[]" type="checkbox" value="検索サイト" id="know03" $know_check03><label for="know03">検索サイト</label>
+													<br><input name="know[]" type="checkbox" value="他のサイト" id="know04" $know_check04><label for="know04">他のサイト</label>
+													<br><input name="know[]" type="checkbox" value="その他" id="know05" $know_check05><label for="know05">その他</label><input type="text" name="know_txt" title="その他の弊社を知ったきっかけ" value="{$enc->h($know_txt)}">
+												</p>
+											</div>
+										</div>
+									</div>
+
+									<p>
+										上記によりご記入いただいたお客さまの情報につきましては、弊社「<a href="http://www.ntt-ba.co.jp/privacy.html">個人情報保護方針</a>」に則り適正に管理し、弊社からのセミナーとサービスのご案内以外には使用いたしません。
+										<br>また、入力フォームの必須項目は必ず入力してください。情報が正しく入力されない場合には、メールマガジンの配信が出来ないことがあります。
+										<br>よろしければ「確認ボタン」をクリックしてください。
+									</p>
+
+									<div class="form-area">
+										<div class="row">
+											<div class="col-xs-12 col-sm-4">
+												<p class="item-area">
+													個人情報の取り扱い<span class="required">※</span>
+													<br><small>（<a href="http://www.ntt-ba.co.jp/privacy.html#a1">詳細はこちらをご覧ください</a>）</small>
+												</p>
+											</div>
+											<div class="col-xs-12 col-sm-8">
+												<p class="input-area">
+													<input name="privacy" type="radio" value="yes" id="privacy01" $privacy_check01><label for="privacy01">同意します</label>
+													<input name="privacy" type="radio" value="no" id="privacy02" $privacy_check02><label for="privacy02">同意しません</label>
+												</p>
+											</div>
+										</div>
+									</div>
+
+									<div class="banner-button text-center">
+										<input src="/img/form_btn.png" type="image" alt="確認">
+									</div>
+									<input type="hidden" name="token"  value="{$enc->h($token)}">
+									<input type="hidden" name="mode" value="confirm">
+								</form>
+	
+EOF
+;
+	
+	}
+
+?>
+
+<!DOCTYPE html>
+<html lang="ja">
+	<head>
+		<meta charset="utf-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+
+		<link href="/img/favicon.ico" rel="icon" type="image/x-icon" />
+		<link href="/img/favicon.ico" rel="shortcut icon" type="img/x-icon" />
+		<!-- ogp -->
+		<meta property="og:site_name" content="ＮＴＴビジネスアソシエ" />
+		<meta property="og:title" content="総務・人事・経理の代行（アウトソーシング）ならＮＴＴビジネスアソシエ" />
+		<meta property="og:description" content="総務・人事・経理の代行（アウトソーシング）なら、ＮＴＴビジネスアソシエにお任せください！ＮＴＴグループで培った豊富な実務経験と高い専門性を生かしたノウハウで、煩雑な間接業務を代行いたします。コンサルティング、アウトソーシング、企業研修などで、総務・人事・経理に関するお悩みを解消いたします。" />
+		<meta property="og:url" content="http://www.ntt-ba.co.jp/" />
+		<meta property="og:image" content="http://www.ntt-ba.co.jp/common/img/ogp.png" />
+		<!--ogp -->
+
+		<title><?php h($content_title); ?></title>
+		<meta name="description" content="NTTビジネスアソシエのメールマガジンのご案内です。NTTグループで培った豊富な実務経験と高い専門性を生かしたノウハウで、煩雑な間接業務を代行いたします。コンサルティング、アウトソーシング、企業研修などで、総務・人事・経理に関するお悩みを解消いたします。" />
+		<meta name="keywords" content="メールマガジン,経理,総務,人事,代行,アウトソーシング,間接業務,コンサルティング,コンサルテーション,NTTビジネスアソシエ,エヌ・ティ・ティ ビジネスアソシエ" />
+
+		<link href="/css/bootstrap.min.css" rel="stylesheet">
+		<link href="/css/font-awesome.min.css" rel="stylesheet">
+		<link href="/css/common.css" rel="stylesheet">
+		<link href="/css/page.css" rel="stylesheet">
+		
+		<?php include( $_SERVER['DOCUMENT_ROOT'] . '/include/header_inc.php' ); ?>
+
+		<!-- GoogleAnalytics 2016.4.1 /////////////////////////////////////////////////////// -->
+		<script>
+		  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+		  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+		  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+		  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+		  ga('create', 'UA-27934865-1', 'auto');
+		  ga('send', 'pageview');
+
+		</script>
+		<!-- //////////////////////////////////////////////////////////////////////////////// -->
+
+	</head>
+	<body><span class="accessKeyDest">ページの先頭です。</span>
+		<!-- #skipnav -->
+		<div id="SkipNav">
+			<ul>
+				<li><a href="#content">コンテンツエリアへ</a></li>
+				<li><a href="#gnavi-area">グローバルナビへ</a></li>
+				<li><a href="#footer">フッタエリアへ</a></li>
+				<li><a href="#header">ページの先頭へ</a></li>
+			</ul>
+		</div>
+		<noscript>
+			<p id="NoScriptWarning">当ウェブサイトを快適にご覧いただくには、ブラウザ のJavaScript設定を有効（オン）、CSSを有効（オン）にしていただく必要がご ざいます。</p> 
+		</noscript>
+		<?php include_once "../common/common_header.html"; ?>
+
+<!-- header -->
+
+<!-- content -->
+		<div id="content"><span class="accessKeyDest">コンテンツエリアはここからです。</span>
+			<div class="container">
+				
+				<ol class="breadcrumb">
+					<li><a href="http://www.ntt-ba.co.jp/">ホーム</a></li>
+					<li><a href="http://www.ntt-ba.co.jpindex.html">メールマガジンのご案内</a></li>
+					<li class="active">ご登録</li>
+				</ol>
+
+				<div id="third-page" class="row">
+					<div class="col-xs-12 col-sm-9">
+						<div id="main-area">
+							<h2 class="main-img"><img src="<?php echo $content_img; ?>" class="img-responsive center-block" alt=""></h2>
+
+							<div class="info-area">
+							
+								<h2>メールマガジン配信のお申し込み</h2>
+						<?php
+							if( $content_caution == 'on' ){
+						?>
+								<p>
+									弊社は事業運営上、お客さまにより良いサービスを提供するために業務の一部を外部に委託しております。委託先は個人情報を適切に取り扱っていると認められる委託先を選定し、契約等において個人情報の適正管理・機密保持などによりお客さまの個人情報の漏洩防止に必要な事項を取り決め適切な管理を実施させます。
+								</p>
+								<p class="text-right">
+									＜個人情報保護管理者　事業連携推進部長＞
+								</p>
+						<?php
+							}
+						?>
+						
+								<?php
+									if( 0 < count($error)) {
+										echo '<div id="error-msg">' . PHP_EOL;
+										echo '<p>' . PHP_EOL;
+										echo '<span class="error-title">エラーメッセージ</span><br>' . PHP_EOL;
+										echo '以下のエラーがありますので、修正してください。' . PHP_EOL;
+											echo '<ul class="error">';
+											foreach ($error as $val) {
+												echo '<li>' . $val . '</li>' . PHP_EOL;
+											}
+											echo '</ul>' . PHP_EOL;
+										echo '</p>' . PHP_EOL;
+										echo '</div>' . PHP_EOL;
+									}
+								?>
+						
+						<?php
+							if( $content_caution == 'on' ){
+						?>
+								<p>
+									以下のフォームに必要事項をご記入ください。
+									<br><span class="required">※</span>印は必須項目となっております。
+								</p>
+						<?php
+							}
+						?>
+<!-- form -->
+					<?php echo $content_body; ?>
+
+<!-- /form -->
+								<hr>
+								<h3>お問い合わせ</h3>
+								<p>
+									NTTビジネスアソシエ株式会社
+									<br>TEL:0120-27-3622　E-mail:<a href="mailto:info@ntt-ba.co.jp">info@ntt-ba.co.jp</a>
+								</p>
+
+							</div>
+						</div>
+					</div>
+					
+					<div class="col-xs-12 col-sm-3">
+						<div id="side-area" class="hidden-xs"><span class="accessKeyDest">サイドナビエリアはここからです。</span>
+							<div id="side-menu">
+								<div class="menu-title">
+									サービスメニュー
+								</div>
+								<ul class="nav nav-pills nav-stacked">
+									<li class="current"><a href="http://www.ntt-ba.co.jp/servicemenu01/index.html"><span class="glyphicon glyphicon-triangle-right" aria-hidden="true"></span>社宅管理・不動産関連</a></li>
+									<li><a href="http://www.ntt-ba.co.jp/servicemenu02/index.html"><span class="glyphicon glyphicon-triangle-right" aria-hidden="true"></span>経理・財務関連</a></li>
+									<li><a href="http://www.ntt-ba.co.jp/servicemenu03/index.html"><span class="glyphicon glyphicon-triangle-right" aria-hidden="true"></span>人事・給与・福利厚生関連</a></li>
+									<li><a href="http://www.ntt-ba.co.jp/servicemenu04/index.html"><span class="glyphicon glyphicon-triangle-right" aria-hidden="true"></span>課題から探す</a></li>
+								</ul>
+							</div>
+
+							<div class="side-banner">
+								<a href="https://www.livingservice.net/living/index.aspx" target="_blank"><img src="/img/link_banner_side05.png" class="img-responsive center-block" alt="Living Service"></a>
+								<a href="http://www.nttkenpo.jp/" target="_blank"><img src="/img/link_banner_side03.png" class="img-responsive center-block" alt="エヌ・ティ・ティ健康保険組合"></a>
+								<a href="http://www.nttkikin.jp/index.php" target="_blank"><img src="/img/link_banner_side04.png" class="img-responsive center-block" alt="エヌ・ティ・ティ企業年金基金"></a>
+								<a href="http://www.ntt-ba.co.jp/associe-club/index.html"><img src="/img/link_banner_side01.png" class="img-responsive center-block" alt="アソシエ倶楽部"></a>
+								<a href="http://www.ntt-ba.co.jp/nttservice.html"><img src="/img/link_banner_side02.png" class="img-responsive center-block" alt="ＮＴＴグループ社員向けサービス一覧"></a>
+								<a href="https://www.ntt-ba.co.jp/inquiry/form/form.html"><img src="/img/inquiry_banner01.png" class="img-responsive center-block" alt="資料請求・お問い合わせはこちら フリーダイヤル 0120-27-3622（平日9時30分～18時）資料請求・お問い合わせ"></a>
+							</div>
+						</div>
+					</div>
+				</div>
+
+			</div><!-- /.container -->
+		</div>
+<!-- content -->
+
+<!-- footer -->
+		<?php include_once "../common/common_footer.html"; ?>
+
+
+		<div>
+			<p id="goto-top">
+				<a href="#header" aria-label="ページトップへ" title="ページトップへ"><span class="glyphicon glyphicon-triangle-top"></span></a>
+			</p>
+		</div>
+
+		<!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+
+		<!-- Include all compiled plugins (below), or include individual files as needed -->
+		
+		<!--[if lt IE 9]>
+			<script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+			<script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+		<![endif]-->
+
+		<script src="/js/bootstrap.min.js"></script>
+		<script src="/js/common.js"></script>
+
+		<!-- Adwordsリマーケ 2016.4.1 /////////////////////////////////////////////////////// -->
+		<script type="text/javascript">
+		/* <![CDATA[ */
+		var google_conversion_id = 931617732;
+		var google_custom_params = window.google_tag_params;
+		var google_remarketing_only = true;
+		/* ]]> */
+		</script>
+		<script type="text/javascript" src="//www.googleadservices.com/pagead/conversion.js">
+		</script>
+		<noscript>
+		<div style="display:inline;">
+		<img height="1" width="1" style="border-style:none;" alt="" src="//googleads.g.doubleclick.net/pagead/viewthroughconversion/931617732/?value=0&amp;guid=ON&amp;script=0"/>
+		</div>
+		</noscript>
+		<!-- //////////////////////////////////////////////////////////////////////////////// -->
+
+		<!-- YDNリターゲ 2016.4.1 /////////////////////////////////////////////////////////// -->
+		<script type="text/javascript" language="javascript">
+		/* <![CDATA[ */
+		var yahoo_retargeting_id = 'LNSL2FSB7N';
+		var yahoo_retargeting_label = '';
+		/* ]]> */
+		</script>
+		<script type="text/javascript" language="javascript" src="//b92.yahoo.co.jp/js/s_retargeting.js"></script>
+		<!-- //////////////////////////////////////////////////////////////////////////////// -->
+
+	</body>
+</html>

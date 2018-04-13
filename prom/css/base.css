@@ -1,0 +1,130 @@
+@charset "UTF-8";
+
+h1, h2, h3, h4, h5, h6, body, html, p, li, dt, dd, pre, form, fieldset {
+	/*font-family: "メイリオ", "ＭＳ Ｐゴシック", Osaka, sans-serif;*/
+	font-family: "Meiryo UI", "Meiryo" ;
+	font-weight: normal;
+	margin: 0px;
+	padding: 0px;
+	color: #626262;
+	font-style: normal;
+	font-size: 16px;
+	line-height: 1.6;
+}
+ul, ol, dl, img {
+	margin: 0px;
+	padding: 0px;
+}
+ul, ol {
+	list-style-type: none;
+}
+img {
+	border-top-style: none;
+	border-right-style: none;
+	border-bottom-style: none;
+	border-left-style: none;
+	font-size: 0%;
+	line-height: 0%;
+	vertical-align: bottom;
+}
+a {
+	text-decoration: none;
+}
+a:link {
+	color: #508fbc;
+}
+a:active {
+	color: #508fbc;
+}
+a:hover {
+	color: #96c3e2;
+	outline:none;
+	text-decoration: none;
+}
+a:visited {
+	color: #508fbc;
+}
+
+/*-- リンクの点線を消去 --*/
+body div a:active, body div a:focus {
+	outline: none;
+}
+
+/*------------ Structure section --------------*/
+.header,#h_box{
+	clear: both;
+	width: 1000px;
+	margin: 0px auto;
+	overflow: hidden;
+	padding: 0 25px;
+}
+
+#wrapper{
+	border-top: 5px solid #1487df;
+}
+
+#h_box{
+	width:960px;
+	background: #fff;
+	padding: 19px 0 14px 0;
+}
+#logo{
+	float:left;
+}
+#tel{
+	float:right;
+}
+#main_visual_wrap{
+	background:#4a91cd;
+}
+#main_visual{
+	width:1000px;
+	height: 356px;
+	margin:0px auto;
+	background:url(../images/bg_main_visual.jpg) no-repeat;
+}
+#main_visual #campaign{
+	background:url(../images/bg_campaign.png) no-repeat;
+	height:100%;
+	background-position: 417px 108px;
+}
+#main_visual #campaign a img{
+	display: block;
+	height: 58px;
+	width: 383px;
+	position: relative;
+	top: 280px;
+	left: 566px;
+}
+#navi_wrap{
+	background:url(../images/bg_menu.jpg) repeat-x;
+	height: 70px;
+	padding-bottom:50px;
+}
+#navi{
+	width:960px;
+	margin:0px auto;
+}
+#navi li{
+	float:left;
+}
+	
+/*------------ Header --------------*/
+
+.pic_l .img, .pic_r .msg {
+	float: left;
+}
+.pic_l .msg, .pic_r .img {
+	float: right;
+}
+.fl_r{
+	float: right;
+}
+.fl_l{
+	float: left;
+}
+.btnhover {
+-ms-filter: "alpha( opacity=70 )";
+filter: alpha( opacity=70 );
+opacity: 0.7;
+}
