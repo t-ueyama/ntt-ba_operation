@@ -1,0 +1,109 @@
+@charset "utf-8";
+
+/* Table Of Contents
+---------------------------------------------------------------------------- 
+General Elements
+header
+gNav
+visual
+topicPath
+footer
+---------------------------------------------------------------------------- */
+
+
+/*General Elements
+---------------------------------------------------------------------------- */	
+body{
+	font-family:'ヒラギノ角ゴ Pro W3', 'Hiragino Kaku Gothic Pro','メイリオ', Meiryo, Osaka, 'ＭＳ Ｐゴシック', 'MS PGothic', sans-serif;	
+	font-size: 12px;
+	line-height: 1.5;
+	-webkit-text-size-adjust: 100%;
+	color:#333;
+}
+.mac body{
+	font-size: 11px;
+}
+a{
+	text-decoration:underline; 
+	color: #2c6cd6;
+	outline: none;
+}
+a:hover{ text-decoration: none; }
+
+/*l-header
+---------------------------------------------------------------------------- */
+.l-header{
+	background: #727171;
+}
+.l-header-inner{
+	margin: 0 auto;
+	width: 1000px;
+}
+.l-header-inner h1{
+	float: left;
+}
+.l-header-inner-right{
+	float: right;
+	width: 489px;
+}
+.l-header-inner-right-tel{
+	float: left;
+}
+.l-header-inner-right-web{
+	float: right;
+}
+.l-header-inner-right-web-text{
+	margin-top: 5px;
+}
+.l-header-inner-right-web-btn{
+	margin-top: 4px;
+}
+
+
+
+
+/* l-gNav
+---------------------------------------------------------------------------- */
+.l-gNav{
+	
+}
+
+
+/* l-topicPath
+---------------------------------------------------------------------------- */
+.l-topicPath{
+
+}
+
+/* l-content
+---------------------------------------------------------------------------- */
+.l-content{
+
+}
+
+/* l-sidebar
+---------------------------------------------------------------------------- */
+.l-sidebar{
+
+}
+/* l-footer
+---------------------------------------------------------------------------- */
+.l-footer{
+	width: 790px;
+	margin: 0 auto;
+	margin-top: 20px;
+}
+.p-footer{
+	margin: 15px 0 35px;
+}
+.p-footer-logo{
+	float: left;
+}
+.p-footer-text{
+	float: right;
+	margin-top: 15px;
+}
+.l-footer-text{
+	text-align: center;
+	margin-bottom: 10px;
+}

@@ -1,0 +1,15 @@
+/*-----------------------------------------------------------
+Temporary　※作業用の一時ファイル。最終的に統合。
+-------------------------------------------------------------*/
+.departBanner ul li.b07,
+.departBanner ul li.b08,
+.departBanner ul li.b09{
+	width:216px;
+	height:34px;	
+}
+.departBanner ul li.b07 a,
+.departBanner ul li.b08 a,
+.departBanner ul li.b09 a{
+	width:216px;
+	height:34px;	
+}

@@ -1,0 +1,60 @@
+<?php
+	require "../topics/wp-config.php";
+
+
+	$args = array(
+		'post_type' 		=> 'post',
+		'posts_per_page'   	=> 1000,
+		'orderby'          	=> 'date',
+		'order'            	=> 'DESC',
+		'post_status'      	=> 'publish',
+		'tax_query' => array(
+            array(
+                'taxonomy' => 'post_tag',
+                'field' => 'slug',
+                'terms' => 'RPA'
+            )
+        )
+	); 
+
+
+
+/*
+	$args = array(
+		'post_type' 		=> 'post',
+		'posts_per_page'   	=> 4,
+		'orderby'          	=> 'date',
+		'order'            	=> 'DESC',
+		'post_status'      	=> 'publish',
+		's' 				=> 'RPA',
+	); 
+*/
+
+	$data = get_posts( $args );
+
+	wp_reset_postdata();
+
+	$html = '';
+
+	if( is_array( $data ) && count( $data ) > 0 )
+	{
+		$html .= '<h3 id="rpa">セミナー・展示会等イベント情報</h3>';
+
+		foreach( $data as $key => $item )
+		{
+			$post_date 	= date( "Y年n月j日" , strtotime( $item->post_date ) );
+			$post_title = $item->post_title;
+			$guid 		= $item->guid;
+
+			$html .= '<dl style="padding: 0 20px;">';
+			$html .= '	<dt class="entry-date">' . $post_date . '</dt>';
+			$html .= '	<dd class="entry-title">';
+			$html .= '		<a href="' . $guid . '">' . $post_title . '</a>';
+			$html .= '	</dd>';
+			$html .= '</dl>';
+			$html .= '<hr>';
+		}
+
+	}
+
+?>

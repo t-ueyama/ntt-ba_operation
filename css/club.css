@@ -1,0 +1,56 @@
+/* club.css
+--------------------------------------------------------------------*/
+.link-right a {
+	color: #333;
+}
+
+#third-page h2 {
+	color: #008000 ;
+	border-left: 6px solid #51AE5D;
+	border-bottom: 1px solid #51AE5D;
+}
+#third-page h2.company-profile {
+	border: none;
+	color: #333;
+	font-size: 20px;
+}
+
+#third-page .club-text {
+	color: #3C8454;
+}
+
+#main-area .info-area ul {
+	list-style-image: none;
+}
+
+#main-area .info-area .glyphicon-triangle-right {
+	font-size: 10px;
+	padding-right: 5px;
+	color: #51AE5D;
+	
+#side-menu .menu-title {
+	background-color: #3C8454;
+	background: -moz-linear-gradient(top, #5EA676, #3C8454); /* Firefox用 */  
+	background: -webkit-gradient(linear, left top, left bottom, from(#5EA676), to(#3C8454)); /* Safari,Google Chrome用 */
+	background: -ms-linear-gradient(top, #5EA676, #3C8454); /* IE */
+}
+
+#side-menu .glyphicon-triangle-right {
+	color: #3C8454;
+}
+
+#side-area .club-banner {
+	margin-bottom: 5px;
+}
+#side-area .club-banner img {
+	padding-bottom: 5px;
+}
+
+/* @media
+--------------------------------------------------------------------*/
+@media (max-width: 767px) {
+
+.img-responsive {
+   width:100%;
+}
+}

@@ -1,0 +1,237 @@
+@charset "UTF-8";
+
+/*----------layout----------*/
+body,div,dl,dt,dd,ul,ol,li,h1,h2,h3,h4,h5,h6,pre,form,fieldset,input,textarea,p,blockquote,th,td{ margin:0px;padding:0px;} 
+table { border-collapse:collapse;border-spacing:0;} 
+fieldset,img {border:0;} 
+address,caption,cite,code,dfn,em,var {font-style:normal;font-weight:normal;} 
+li{list-style:none;} 
+caption,th{text-align:left;}
+q:before,q:after {ontent:'';} 
+abbr,acronym { border:0;} 
+sup{vertical-align:text-top;}
+sub{vertical-align:text-bottom;}
+
+.alt{position:absolute;top:-5000px;left:-999px;}
+.alttext{text-indent:-9999px;}
+.floatleft{float:left;}
+.floatright{float:right;}
+.clearboth{clear:both;}
+.clearfloat
+{
+	height:1px;
+	font-size:1%;
+	clear:both;
+	display:block;
+}
+
+html,body {
+	font-family:'Lucida Grande', 'Hiragino Kaku Gothic ProN', 'ヒラギノ角ゴ ProN W3', Meiryo, メイリオ,sans-serif;
+}
+* html body {/*IE6*/
+	font-family: "ＭＳ Ｐゴシック","MS PGothic",sans-serif;
+}
+
+*:first-child + html body {/*IE7*/
+	font-family: "ＭＳ Ｐゴシック","MS PGothic",sans-serif;
+}
+
+/*----------font----------*/
+h1,h2,h3,h4,h5,h6 {font-size:100%; font-weight:normal;} 
+input,textarea,select{font-family:inherit;font-size:inherit;font-weight:inherit}
+
+
+/*----------clearfix----------*/
+	* html .clearfix {
+		zoom: 1;
+	}
+
+	*+html .clearfix {
+		zoom: 1;
+	}
+
+.clearfix:after {
+	height: 0;
+	visibility: hidden;
+	content: ".";
+	display: block;
+	clear: both;
+}
+
+a img:hover {
+	filter: alpha( opacity=70 ); /*ie7*/
+	-ms-filter: "alpha( opacity=70 )"; /*ie8*/
+	opacity: 0.7;
+}
+
+
+/*------------------------------------------*/
+
+#wrapper {
+	width: 100%;
+	font-size: 16px;
+	line-height: 1.6;
+}
+
+
+/*---------------------------------------
+header footer
+---------------------------------------*/
+
+#wrapper .header {
+	width: 100%;
+	height: 70px;
+	background-color: #727171;
+}
+
+#wrapper .header .inner {
+	width: 1000px;
+	margin: 0 auto;
+	position: relative;
+}
+
+#wrapper .header .inner .logo {
+  float: left;
+  padding-top: 7px;
+}
+
+#wrapper .header .inner .inquiry_tel {
+  float: right;
+  padding-top: 7px;
+  padding-right: 20px;
+}
+
+#wrapper .header .inner .inquiry_web {
+  float: right;
+  display: block;
+  width: 254px;
+  height: 60px;
+  padding-top: 3px;
+  background: url(../images/hdr_img_inquiry_web_w.png) no-repeat;
+background-position: 0 28px
+}
+
+#wrapper .footer {
+	width: 100%;
+	text-align: center;
+}
+#wrapper .footer .inner {
+	width: 1000px;
+	margin: 20px auto;
+	position: relative;
+}
+#wrapper .footer .company,
+#wrapper .footer .address {
+  display: inline-block;
+  margin: 0 15px;
+  vertical-align: middle;
+}
+#wrapper .footer .address {
+  font-size: 10px;
+  font-size: 1.0rem;
+}
+#wrapper .footer .copyright {
+  margin-top: 25px;
+  font-size: 8px;
+  font-size: 0.8rem;
+}
+
+/*------------------------------------
+contents
+--------------------------------------*/
+#contents {
+	widows: 100%;
+	position: relative;
+}
+#contents .section01 {
+	display: block;
+	width: 100%;
+	background-color: #d70c19;
+}
+#contents .section01 .inner {
+	width: 1200px;
+	margin: 0 auto;
+}
+#contents .inquiry01 {
+	width: 100%;
+	background-color: #fff799;
+}
+#contents .inquiry01 .inner {
+	width: 1200px;
+	margin: 0 auto;
+	position: relative;
+}
+#contents .inquiry01 .contact_web {
+	right: 100px;
+	bottom: 30px;
+	position: absolute;
+}
+#contents .section02 {
+	width: 100%;
+	margin: 10px 0 10px 0;
+	background-color: #fff;
+}
+#contents .section02 .inner {
+	width: 1200px;
+	text-align: center;
+	margin: 0 auto;
+}
+#contents .inquiry02 {
+	width: 100%;
+	background-color: #f9c03c;
+}
+#contents .inquiry02 .inner {
+	width: 1200px;
+	margin: 0 auto;
+	position: relative;
+}
+#contents .inquiry02 .contact_web {
+	right: 100px;
+	bottom: 10px;
+	position: absolute;
+}
+#contents .inquiry03 {
+	width: 100%;
+	background-color: #fff799;
+}
+#contents .inquiry03 .inner {
+	width: 1200px;
+	margin: 0 auto;
+	position: relative;
+}
+#contents .inquiry03 .contact_web {
+	right: 100px;
+	bottom: 15px;
+	position: absolute;
+}
+#contents .g_navi {
+	width: 100%;
+	margin: 20px 0 10px 0;
+	text-align: center;
+	background-color: #fff;
+}
+#contents .g_navi ul {
+	display: inline-block;
+	position: relative;
+	width: 1000px;
+	height: 66px;
+	list-style: none;
+}
+#contents .g_navi ul li {
+  position: absolute;
+  width: 250px;
+  height: 66px;
+}
+#contents .g_navi ul li.g_navi1 {
+  left: 0;
+}
+#contents .g_navi ul li.g_navi2 {
+  left: 250px;
+}
+#contents .g_navi ul li.g_navi3 {
+  left: 500px;
+}
+#contents .g_navi ul li.g_navi4 {
+  left: 750px;
+}
+

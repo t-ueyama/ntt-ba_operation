@@ -1,0 +1,83 @@
+@charset "utf-8";
+/*
+Theme Name: NTT-BA
+Author: NTT BUSINESS ASSOCIE Corporation
+Version: 1.0
+*/
+
+#main-area dl.wp-loop {
+	padding: 0 20px;
+}
+
+#main-area dl.wp-loop dt {
+	text-align: left;
+	width: 150px;
+}
+
+#main-area dl.wp-loop dd {
+	margin-left: 150px;
+}
+
+#main-area dl.wp-loop a {
+	color: #555;
+}
+
+#main-area .info-area img {
+	max-width: 100%;
+	height: auto;
+	padding: 20px;
+}
+
+#main-area .table-area {
+	padding: 20px;
+}
+
+#wp-single table {
+
+	width: 100%;
+}
+
+#wp-single table th,
+#wp-single table td {
+	padding: 15px 10px;
+	border-top: 1px solid #a7a59d;
+}
+
+#wp-single table th:nth-last-child(2),
+#wp-single table td:last-child {
+	border-bottom: 1px solid #a7a59d;
+}
+
+#wp-single table th {
+	background-color: #F3F2EE;
+	width: 20%;
+}
+
+#wp-single table td {
+	width: 100%;
+}
+
+#wp-single .seminar-inquiry {
+	margin: 40px 20px 10px;
+	padding: 10px;
+	border: 1px solid #F5B284;
+	background-color: #F9F1D1;
+}
+
+#wp-single .seminar-inquiry hr {
+	margin: 10px;
+	border-color: #E3D7A5;
+}
+
+/* img */
+#wp-single img.aligncenter {
+	display: block;
+	margin: 0 auto;
+}
+#wp-single img.alignright { float: right; }
+#wp-single img.alignleft { float: left; }
+
+/* 201706 topics pdf -------------------- */
+img.depr {
+	padding-right:0px !important;
+}
